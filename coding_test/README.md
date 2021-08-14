@@ -22,6 +22,8 @@ function solution(answers) {
   }
   a.sort((a,b) => a-b);
   a.forEach((a) => b.push(a+1))
+  
+  
   return b
 }
 
