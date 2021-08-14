@@ -6,7 +6,6 @@
 
 reduce 함수에 배열의 값은 상관 없고 인덱스만 사용해서 계산을 할 수도 있다. 필요가 없기에 _ 표시를 한것.
 
-<hr/>
 
 
    var a1c = answers.filter((a,i)=> a === a1[i%a1.length]).length
