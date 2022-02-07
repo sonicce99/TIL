@@ -216,7 +216,6 @@ const rotate = keyframes`
   }
 `;
 
-// Here we create a component that will rotate everything we pass in over two seconds
 const Rotate = styled.div`
   display: inline-block;
   animation: ${rotate} 2s linear infinite;
