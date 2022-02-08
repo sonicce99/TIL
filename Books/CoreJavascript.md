@@ -145,8 +145,43 @@ var ds = new Employee("동수", "male", "구글");
 
 ***
 
-
 ## 4장 콜백 함수
+
+콜백함수의 제어권을 넘겨받은 코드는 콜백함수 호출 시점에 대한 제어권을 가집니다.
+
+Array.prototype 에 담긴 map 메서드는 다음과 같은 구조로 이뤄져 있습니다.
+
+
+```Javascript
+Array.prototype.map(callback[, thisArg])
+
+callback: function(currentValue, index, origin);
+```
+
+왜 map 의 인자로 콜백함수 일까?
+
+=> 원하는 시간에 알람이 울리는 결과를 얻기 위해서는 시계가 정한 규칙, 즉 "알람용 침이 원하는 시간을 가리키도록 정하고 알람 스위치를 ON 으로 해야한다" 라는 규칙을 따라야만 합니다.
+
+마찬가지로 map 메서드를 호출해서 원하는 배열을 얻으려면 map 메서드에 정의된 규칙에 따라서 함수를 작성해야 합니다.
+
+이처럼 콜백 함수의 제어권을 넘겨받은 코드는 콜백함수를 호출할 때 인자에 어떤 값들을 어떤 순서로 넘길 것인지에 대한 제어권을 가집니다.
+
+#### 콜백함수는 함수다
+
+콜백 함수는 함수입니다. 콜백 함수로 어떤 객체의 메서드를 전달 하더라도 그 메서드는 메서드가 아닌 함수로서 호출됩니다.
+
+```Javascript
+var obj = {
+  vals : [1,2,3],
+  logValues : function (v,i) {
+    console.log(this,v,i);
+  }
+};
+obj.logValues(1,2); // { vals: [1,2,3], logValues: f } 1 2
+[4,5,6].forEach(obj.logValues); // Window { ... } 4 0
+```
+
+
 
 ***
 
