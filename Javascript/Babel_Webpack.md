@@ -99,3 +99,61 @@ $ npm install --save-dev @babel/plugin-proposal-class-properties
   "plugins": ["@babel/plugin-proposal-class-properties"]
 }
 ```
+
+***
+
+## Webpack
+
+Webpack은 의존 관계에 있는 모듈들을 하나의 자바스크립트 파일로 번들링하는 모듈 번들러이다.
+Webpack을 사용하면 의존 모듈이 하나의 파일로 번들링되므로 별도의 모듈 로더가 필요없다. 그리고 다수의 자바스크립트 파일을 하나의 파일로 번들링하므로 html 파일에서 script태그로 다수의 자바스크립트 파일을 로드해야하는 번거로움도 사라진다.
+
+### Webpack 설치
+
+```
+$ npm install --save-dev webpack webpack-cli
+```
+
+### babel-loader
+
+Webpack이 모듈을 번들링할 때 Babel을 사용하여 ES6 코드를 ES5로 트랜스파일링하도록 babel-loader를 설치한다.
+
+```
+$ npm install --save-dev babel-loader
+```
+
+### webpack.config.js
+
+```
+const path = require('path');
+
+module.exports = {
+  // enntry file
+  entry: './src/js/main.js',
+  // 컴파일 + 번들링된 js 파일이 저장될 경로와 이름 지정
+  output: {
+    path: path.resolve(__dirname, 'dist/js'),
+    filename: 'bundle.js'
+  },
+  module: {
+    rules: [
+      {
+        test: /\.js$/,
+        include: [
+          path.resolve(__dirname, 'src/js')
+        ],
+        exclude: /node_modules/,
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: ['@babel/preset-env'],
+            plugins: ['@babel/plugin-proposal-class-properties']
+          }
+        }
+      }
+    ]
+  },
+  devtool: 'source-map',
+  // https://webpack.js.org/concepts/mode/#mode-development
+  mode: 'development'
+};
+```
