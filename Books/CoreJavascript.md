@@ -188,6 +188,33 @@ obj.logValues(1,2); // { vals: [1,2,3], logValues: f } 1 2
 
 ## 5장 클로저
 
+함수와 렉시컬 환경의 조합.
+함수가 생성될 당시의 외부변수를 기억, 생성 이후에도 계속 접근 가능.  
+
+클로저는 어떤 함수 A에서 선언한 변수 a를 참조하는 내부함수 B를 외부로 전달할 경우 A의 실행컨텍스트가 종료된 이후에도 변수 a가 사라지지 않는 현상.
+
+```Javascript
+var outer = function () {
+  var a = 1;
+  var inner = function () {
+    return ++a;
+  };
+  return inner;
+};
+var outer2 = outer();
+
+console.log(outer2);
+console.log(outer2);
+```
+
+#### 클로저의 활용 사례
+
+- 콜백함수 내부에서 외부 데이터를 사용하고자 할 때
+
+- 접근 권한 제어(정보은닉)  
+
+- 부분 적용 함수  
+
 ***
 
 
