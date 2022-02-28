@@ -24,7 +24,7 @@
 ```
 
 
-### NPM으로 시작하기
+### npm으로 시작하기
 
 ```
 vue create (원하는 폴더명) // 폴더로 vue 만들기
@@ -313,3 +313,78 @@ SignIn과 SignUp 2가지이다.
 <img width="418" alt="스크린샷 2021-11-13 오후 9 19 50" src="https://user-images.githubusercontent.com/87749134/141643561-7d7f748f-93e1-42c6-8795-a21b17f21d55.png">
 
 <img width="418" alt="스크린샷 2021-11-13 오후 9 19 42" src="https://user-images.githubusercontent.com/87749134/141643562-448331f7-c1b7-4a91-a18f-9c4ff59e8844.png">
+
+### computed Getter, Setter
+
+기본적으로 computed는 Getter이다. 하지만 값을 변경할 수도 있다.
+
+```javascript
+<script>
+export default {
+  data() {
+    return {
+      msg : Hello Computed!
+    }
+  },
+  computed: {
+    reversedMessage: {
+      get() {
+        return Blah Blah Blah
+      },
+      set(value) {
+        this.msg = value
+      }
+    }
+  },
+  methods: {
+    add() {
+      this.reversedMessage += "!?"
+    }
+  }
+}
+</script>
+```
+
+### Watch
+
+data, computed에 존재하는 값을 계속 watch (지켜보고) 하다가 값이 변경되면 내용을 수행  
+
+```javascript
+<script>
+export default {
+  data() {
+    return {
+      msg : Hello Computed!
+    }
+  },
+  computed: {
+    reversedMessage: {
+      return Blah Blah Blah
+    }
+  },
+  watch: {
+    msg() {
+      console.log(this.msg)
+    }
+    // or
+    msg(value) { // 변경된 값    
+      console.log(value)
+    }
+  },
+  methods: {
+    changeMessage() {
+      this.msg += "Good!"
+    }
+  }
+}
+</script>
+```
+
+### Class 바인딩
+
+조건에 따라서 Class 이름 설정
+
+```javascript
+:class="{ active : isActive, "text-danger" : hasError }"    
+// isActive 가 true 이면 active라는 이름 사용, false면 사용 X  
+```
