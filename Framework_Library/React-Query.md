@@ -67,3 +67,42 @@ ex) 페이스북에서 좋아요를 누르면 Api 통신을 하는데 일단 성
 - devtool 제공으로 원할한 디버깅
 
 - Cache 전략 필요할 때 아주 좋음  
+
+
+***
+
+## 사용법
+
+1. QueryClient, QueryClientProvider를 설정해준다.    
+
+```javascript
+// index.jsx
+
+import React from "react";
+import ReactDOM from "react-dom";
+import App from "./App";
+import { QueryClient, QueryClientProvider } from "react-query";
+
+const queryClient = new QueryClient();
+
+ReactDOM.render(
+  <React.StrictMode>
+    <QueryClientProvider client={queryClient}>
+      <App />
+    </QueryClientProvider>
+  </React.StrictMode>,
+  document.getElementById("root")
+);
+```
+
+2. useQuery 로 데이터를 fetch해온다.
+
+```javascript
+const { isLoading, data } = useQuery("", () => {
+  fetch("/api").then((res) => {
+    return res
+  })
+})
+
+console.log(data);
+```
