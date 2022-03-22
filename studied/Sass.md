@@ -1,5 +1,7 @@
 # Sass
 
+참조 사이트 : https://poiemaweb.com/  
+
 Sass는 CSS pre-processor로서 CSS의 한계와 단점을 보완하여 보다 가독성이 높고 코드의 재사용에 유리한 CSS를 생성하기 위한 CSS의 확장이다.
 
 ## Sass의 장점
@@ -753,3 +755,110 @@ $gutter-width: 10px;
 ```
 
 ***
+
+## 기본 내장 함수  
+
+### percentage
+
+```
+percentage(0.2)          => 20%
+percentage(100px / 50px) => 200%
+```
+
+### round(반올림)
+
+```
+round(10.4px) => 10px
+round(10.6px) => 11px
+```
+
+### ceil(올림)  
+
+```
+ceil(10.4px) => 11px
+ceil(10.6px) => 11px
+```
+
+###  floor (내림)  
+
+```
+floor(10.4px) => 10px
+floor(10.6px) => 10px
+```
+
+### 절대값
+
+```
+abs(10px) => 10px
+abs(-10px) => 10px
+```
+
+등등 여러 문법들이 있음..
+
+***
+
+## Webpack 개발 환경에서 Sass 사용하기
+
+1. 패키지 설치하기
+
+```
+$ npm install --save-dev webpack webpack-cli css-loader sass sass-loader mini-css-extract-plugin
+```
+
+package.json은 다음과 같다. npm scripts에 build를 추가한다.
+
+```
+{
+  "name": "sass-project",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "webpack -w"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "css-loader": "^5.0.2",
+    "mini-css-extract-plugin": "^1.3.6",
+    "sass": "^1.32.7",
+    "sass-loader": "^11.0.1",
+    "webpack": "^5.21.2",
+    "webpack-cli": "^4.5.0"
+  }
+}
+```
+
+-w : 타깃 폴더에 있는 모든 파일들의 변경을 감지하여 자동으로 트랜스파일한다. (--watch 옵션의 축약형)
+
+프로젝트 루트에 webpack.config.js 파일을 생성하고 다음과 같이 수정한다.
+
+```javascript
+const path = require('path');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+
+module.exports = {
+  entry: './src/sass/foo.scss',
+  output: {
+    path: path.resolve(__dirname, 'public')
+  },
+  plugins: [
+    // 컴파일 + 번들링 CSS 파일이 저장될 경로와 이름 지정
+    new MiniCssExtractPlugin({ filename: 'css/style.css' })
+  ],
+  module: {
+    rules: [
+      {
+        test: /\.s[ac]ss$/i,
+        use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader'],
+        exclude: /node_modules/
+      }
+    ]
+  },
+  devtool: 'source-map',
+  mode: 'development'
+};
+```
+
+다음 명령으로 빌드를 실행하면 webpack.config.js 파일에 지정한 경로(‘public/css/style.css’)에 컴파일되어 번들링된 css 파일이 저장된다.
