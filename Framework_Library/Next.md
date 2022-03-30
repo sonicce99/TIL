@@ -108,4 +108,7 @@ export default function Blog() {
 
 2. next export (SSG 방식)
 
-  > node 서버가 없이 이미 존재하는 html 파일을 랜더링  
+  > node 서버가 없이 이미 존재하는 html 파일을 랜더링
+
+
+    
