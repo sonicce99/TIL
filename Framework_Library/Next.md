@@ -95,6 +95,11 @@ export default function Blog() {
 
 ❗️ npm run dev 상태에서는 셋의 차의를 명확히 알기 어렵다. 반드시 Build해서 차이를 알아볼 것.  
 
+- 공식 문서에서 언급  
+
+In development mode (when you run npm run dev or yarn dev), every page is pre-rendered on each request — even for pages that use Static Generation.  
+
+
 ### getStaticProps (Static Generation)
 
   > 이미 모든 페이지가 작성되어 있음 (Build할 때 데이터로 작성됨)  
@@ -118,7 +123,51 @@ export async function getStaticProps(context) {
 
 ### getStaticPaths (Static Generation)
 
-  > 다이나믹 라우트를 사용했을 때 어떤 페이지를 내려줄지 구체화  
+- Build Time에 미리 우리가 보여줘야할 페이지들을 구성할 수 있다.  
+
+  > 다이나믹 라우트를 사용했을 때 어떤 페이지를 내려줄지 구체화
+
+  <img src="https://user-images.githubusercontent.com/87749134/161176286-a6f75c06-3dd5-4e5a-a33d-16cac52e9ceb.png" alt="image" width="600px" />
+
+  Build가 되면 외부 데이터를 Fetch해서 가지고 있게 된다. 이때 특정 데이터마다 보여주는 페이지를 다르게 할 수 있다.
+
+  ❗️ 단, 데이터는 무조건 an array of objects 여야 한다.  / 각각의 object는 params라는 key를 가지고 있어야한다. 이렇게 하지 않으면 ```getStaticPaths``` 는 fail한다.  
+
+```Javascript
+// Returns an array that looks like this:
+// [
+//   {
+//     params: {
+//       id: 'ssg-ssr' // key 값은 라우터 이름에 맞게 하면 된다.  
+//     }
+//   },
+//   {
+//     params: {
+//       id: 'pre-rendering'
+//     }
+//   }
+// ]
+
+// 여기서는 데이터가 2개니까 2개의 다이나믹 페이지가 만들어질 것이다.  
+```
+
+```Javascript
+export async function getStaticPaths() {
+  const res = await fetch("https://api...");
+  const data = await res.json(); // 데이터는 반드시 배열 형태에 params key가 있어야한다.  
+
+  const paths = data;
+
+  console.log("getStaticProps"); // 콘솔이 찍히지 않음.
+
+  return {
+    paths,
+    fallback: false // false 이면 경로에 맞는 값이 아닐경우 404 page를 보여주는 옵션  
+  };
+}
+```
+
+  > 구조적으로 굉장히 효과적인 느낌이 듬.   
 
 ### getServerSideProps (Server-side Rendering)
 
@@ -194,13 +243,31 @@ import Head from "next/head";
 
 ## CSS styling
 
-- style jsx는 vercel에서 만든 styled-jsx 라이브러리이다. 
+- style jsx는 vercel에서 만든 styled-jsx 라이브러리이다.  
 
 ```Javascript
 <style jsx>
 
 </style>
 ```
+
+***
+
+## Pre-rendering  
+
+1. 기본적으로 Next.js는 모든 페이지를 Pre-rendering을 한다. (better Performance / SEO)  
+
+- hydration : 페이지가 브라우저에 로드되고 자바스크립트 코드가 실행되면서 사용자와 인터렉션 하기 직전의 단계까지의 과정
+
+> hydration 이 됬다 => 사용자와 인터렉션 하기 위한 준비가 끝났다.
+
+<img width="600px" src="https://user-images.githubusercontent.com/87749134/161017072-0194458b-d237-4c15-82fe-48a18ef1e105.png" alt="asd" />
+
+2. 원하는 페이지마다 SSG, SSR 을 선택 할 수 있다.
+
+<img src="https://user-images.githubusercontent.com/87749134/161018645-66a7cc28-8d29-4f1a-8246-e174fa4696f1.png" alt="asd" width="600px" />
+
+
 
 ## 배포하기
 
