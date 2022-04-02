@@ -162,12 +162,37 @@ export async function getStaticPaths() {
 
   return {
     paths,
-    fallback: false // false 이면 경로에 맞는 값이 아닐경우 404 page를 보여주는 옵션  
+    fallback: false
   };
 }
 ```
 
-  > 구조적으로 굉장히 효과적인 느낌이 듬.   
+#### fallback의 종류
+
+- getStaticPaths에는 항상 paths, fallback 값을 return 해야 한다. 종류는 3가지가 있다.
+
+1. false (default)
+
+  > paths 에 맞는 값이 없으면 404 Error를 띄운다.
+
+2. true
+
+  > paths에 맞는 값이 없으면 다시 isFallback을 실행시킨 뒤 페이지를 보여준다.
+
+3. "blocking"
+
+  > paths에 맞는 값이 없어도 router.isFallback을 실행시키지 않고 그냥 기다린 뒤에 페이지를 보여준다.  
+
+```Javascript
+export default function Post({ postData }) {
+  const router = useRouter();
+
+  if(router.isFallback) {
+    return <h2>Loading...</h2>
+  }
+}
+```
+
 
 ### getServerSideProps (Server-side Rendering)
 
