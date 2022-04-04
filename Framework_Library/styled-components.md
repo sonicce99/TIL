@@ -14,7 +14,7 @@ vscode-styled-components
 
 ***
 
-### 기본 사용  
+## 기본 사용  
 
 ```javascript
 import styled from "styled-components";
@@ -44,9 +44,11 @@ const StyledComponentExample = () => {
 }
 ```
 
+***
+
 Component 안에 css가 같이 들어가 있음.
 
-### Props 사용  
+## Props 사용  
 
 🌟 props에 따라 다른 색상을 적용할 수 있음.   
 
@@ -75,7 +77,9 @@ const StyledComponentExample = () => {
 }
 ```
 
-### 상속  
+***
+
+## 상속  
 
 🌟 style 조차조 상속 할 수 있음.
 
@@ -109,7 +113,9 @@ const StyledComponentExample = () => {
 }
 ```
 
-### a 태그  
+***
+
+## a 태그  
 
 ```javascript
 import styled from "styled-components";
@@ -142,7 +148,9 @@ const StyledComponentExample = () => {
 }
 ```
 
-### 다양한 기능  
+***
+
+## 다양한 기능  
 
 as에는 native tags 뿐만 아니라 우리가 원하는 태그 무엇이든지 확장할 수 있다.
 
@@ -200,7 +208,9 @@ render(
 );
 ```
 
-### 애니매이션 사용  
+***
+
+## 애니매이션 사용  
 
 ```javascript
 import styled, {keyframes} from "styled-components";
@@ -226,4 +236,29 @@ const Rotate = styled.div`
 render(
   <Rotate>💅🏾</Rotate>
 );
+```
+
+***
+
+
+## ServerStyleSheet
+
+The basic idea is that everytime you render your app on the server, you can create a ServerStyleSheet and add a provider to your React tree, that accepts styles via a context API.
+
+This doesn't interfere with global styles, such as keyframes or createGlobalStyle and allows you to use styled-components with React DOM's various SSR APIs.
+
+```javascript
+import { renderToString } from 'react-dom/server';
+import { ServerStyleSheet } from 'styled-components';
+
+const sheet = new ServerStyleSheet();
+try {
+  const html = renderToString(sheet.collectStyles(<YourApp />));
+  const styleTags = sheet.getStyleTags(); // or sheet.getStyleElement();
+} catch (error) {
+  // handle error
+  console.error(error);
+} finally {
+  sheet.seal();
+}
 ```
