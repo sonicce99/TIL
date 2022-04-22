@@ -4,20 +4,6 @@ React 프레임워크이고 Verel 이라는 회사에서 만듬.
 
 ***
 
-## 장점
-
-1. pre-render (for Performance / SEO)
-
-2. 정적 사이트를 만들 수 있다.
-
-3. Code splitting and prefetching (link 태그로 감싸진 친구들은 미리 데이터를 가져온다.)
-
-> 성능이 좋다.
-
-3. Zero Config ... 등등
-
-***
-
 ## 설치
 
 ### 1. Manual Setup
@@ -26,7 +12,7 @@ React 프레임워크이고 Verel 이라는 회사에서 만듬.
 $ npm install next react react-dom
 ```
 
-```
+```bash
 // package.json
 
 "scripts": {
@@ -37,23 +23,29 @@ $ npm install next react react-dom
 }
 ```
 
-- pages 폴더 생성
-
-- pages/index.js 파일 생성하고 아래와 같은 코드 입력
-
-```Javascript
-function HomePage() {
-  return <div>Welcome to Next.js!</div>
-}
-
-export default HomePage
-```
-
 ### 2. create-next-app
 
 ```bash
 npx create-next-app@latest --typescript myApp
 ```
+
+***
+
+## Next.js가 SSR을 수행하는 방식
+
+- CSR : 첫 렌더시 그냥 페이지 로드, 다시 렌더링함으로써 데이터를 불러옴. 그래서 데이터가 검색엔진에 안 걸림. 그러나 한 번에 데이터를 다 불러오기 때문에 페이지 이동할 때 빠름
+
+- SSR : 첫 렌더시 데이터도 서버측에서 함께 로드. 렌더 한 번이라 초기 로딩속도 빠르고, 검색엔진에 데이터들이 걸림. 그러나 페이지 불러올 때마다 중복 데이터 불러와야 해서 페이지 이동시 느림.
+
+일반적으로 CSR의 경우, **초기에 페이지가 일단 렌더가 된 이후, 클라이언트에서 데이터를 불러오며 다시 한 번 렌더링이 됩니다.**  한편, SSR을 수행하는 경우, **처음 렌더가 될 때 서버 측에서 데이터도 함께 가져와서 그려줍니다.** 그렇기 때문에 SSR의 경우, 한 번에 렌더링이 되기 때문에 초기 로딩속도가 빠르지만 페이지를 넘길 때마다 중복되는 데이터일지도 서버측에서 다시 불러와줘야하기 때문에 페이지 과부하가 걸릴 위험성이 CSR에 비해 큽니다. 그럼에도 SSR을 사용하는 이유는 페이지가 로딩될 때 데이터도 동시에 로드되기 때문에 검색엔진에 해당 데이터들이 걸리기 때문입니다. 따라서 첫 로드시 빈 상태인 CSR과 달리 검색엔진 최적화에 효과적입니다.
+
+❗️ **Next.js는 SSR을 기반으로 하지만, 페이지가 로드된 이후엔 React에서 CSR을 이용하는 방식을 차용합니다.**
+
+페이지가 그려진 이후에 페이지 내부에서 동적인 데이터를 패치하는 과정(axios,swr 등을 이용)은 CSR의 방식을 따릅니다. 이때의 데이터들은 일단 페이지가 로드된 이후에 클라이언트 측에서 다시 렌더되며 불러와집니다. 그렇기 때문에 SEO에 걸리지 않습니다.
+
+**그렇기 때문에 만약 페이지가 로드될 때 함께 데이터가 패칭되어야 하는 상황이라면(pre-rendering) next.js의 데이터 패칭 방식 (getStaticProps, getStaticPath, getServerSideProps)을 이용해 첫 렌더에 데이터가 패칭될 수 있도록 처리를 해주어야 합니다.**
+
+모든 페이지에 공통적인 데이터 패칭이 필요하다면 **_app.tsx에서 미리 데이터 패칭을 해주면 되고, 페이지마다 다른 데이터가 필요하다면 페이지마다 데이터 패칭을 해주면 됩니다.** 그 구체적인 방법에 대해 알아보겠습니다.
 
 ***
 
@@ -120,6 +112,15 @@ export async function getStaticProps(context) {
   };
 }
 ```
+
+#### getStaticProps가 리턴할 수 있는 값
+
+1. props : 해당 컴포넌트로 리턴할 값 (선택적)
+
+2. revalidate : 페이지 재생성이 발생할 수 있는 시간(초). 기본값은 false이며, 이게 거짓이면 다음 빌드때까지 페이지가 빌드된 상태로 캐시됨. (선택적)
+
+3. notFound : Boolean값, 404status를 보내는 것을 허용한다. (선택적)
+
 
 ### getStaticPaths (Static Generation)
 
@@ -193,6 +194,13 @@ export default function Post({ postData }) {
 }
 ```
 
+#### getStaticPaths가 리턴할 수 있는 값
+
+1. paths : 빌드타임에 pre-rendering할 경로들
+
+2. fallback : paths 이외의 경로들에 대해 추후 요청이 들어오면 만들어 줄지 말지. 만다면 404를 리턴함.
+
+
 
 ### getServerSideProps (Server-side Rendering)
 
@@ -201,17 +209,47 @@ export default function Post({ postData }) {
   > 자바스크립트가 없다면 아무것도 사용자는 볼 수 없음.
 
 ```Javascript
-export async function getServerSideProps(context) {
-  const res = await fetch("https://api...");
-  const data = await res.json();
+// 타입 지정을 위해 import
+import { GetServerSideProps } from 'next'
 
-  console.log("getServerSideProps"); // 새로고침 할 때마다 계속 콘솔이 찍힘.
-
-  return {
-    props: { data }
-  };
+function Page({ data }) {
+  console.log(this.props.data)
+ //res.json()이 찍힙니다
 }
+
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+
+  const res = await fetch(`https://.../data`)
+  const data = await res.json()
+
+  // data 없을 땐 리턴값을 달리함
+   if (!data) {
+    return {
+      redirect: {
+        destination: '/',
+        permanent: false,
+      },
+    }
+  }
+
+  //pageProps로 넘길 데이터
+  return { props: { data: data } }
+}
+
+export default Page
 ```
+
+#### getServerSideProps가 리턴할 수 있는 값
+
+1. props : 해당 컴포넌트로 리턴할 값 (선택적)
+
+2. redirect : 값 내부와 외부 리소스 리디렉션 허용한다 (선택적) 무조건 { destination: string, permanent: boolean } 의 꼴이어야 한다. 몇몇 드문 케이스에서 오래된 HTTP클라이언트를 적절히 리디렉션하기 위해 커스텀 status코드가 필요할 수 있는데, 그땐 permanent property 대신에 statusCode property를 이용한다.
+
+3. notFound : Boolean값, 404status를 보내는 것을 허용한다. (선택적)
+
+
+getServerSideProps는 페이지를 렌더링하기전에 반드시 fetch해야할 데이터가 있을 때 사용합니다. 매 페이지 요청시마다 호출되므로 getStaticProps보다 느리지만, 빌드 이후에도 페이지 요청마다 실행된다는 특징이 있습니다.
 
 ***
 
