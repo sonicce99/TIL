@@ -192,7 +192,7 @@ const alertSlice = createSlice({
 
 앞서 소개해드린 ```createAction```, ```createReducer``` 함수가 내부적으로 사용되며 ```createSlice```에 선언된 슬라이스 이름을 따라서 리듀서와 그리고 그것에 상응하는 액션 생성자와 액션 타입을 자동으로 생성합니다. 따라서 ```createSlice```를 사용하면 따로 ```createAction```, ```createReducer```를 작성할 필요가 없습니다.  
 
-공식 문서의 [리덕스 스타일 가이드][https://redux.js.org/style-guide/]에 따르면 슬라이스 파일은 ```feature 폴더``` 안에서 상태 도메인 별로 나누어 정리하고 있습니다.  
+공식 문서의 [리덕스 스타일 가이드]https://redux.js.org/style-guide 에 따르면 슬라이스 파일은 ```feature 폴더``` 안에서 상태 도메인 별로 나누어 정리하고 있습니다.  
 
 ```javascript
 // features/todos/todosSlice.js
