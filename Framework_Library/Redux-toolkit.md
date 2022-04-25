@@ -22,6 +22,55 @@ Redux Toolkit includes these APIs:
 
 간단한 설정과 default를 위해 ```createStore```을 감싸세요. createStore은 자동적으로 reducer 들을 combine하고 어떤 Redux middleware 라고 추가할 수 있습니다. (Redux-thunk는 default) 그리고 ```Redux DevTools EXtention``` 사용을 가능하게 합니다.
 
+```javascript
+import { configureStore } from '@reduxjs/toolkit'
+
+import rootReducer from './reducers'
+
+const store = configureStore({ reducer: rootReducer })
+```
+
+위처럼 선언하면 기본 미들웨어로 ```redux-thunk```를 추가하고 개발 환경에서 ```리덕스 개발자 도구(Redux DevTools Extension)```를 활성화해줍니다. 이전에는 매번 프로젝트를 시작할 때마다 이런 설정을 직접 하는 불편한 과정이 있었다고 하니 개발 경험을 높이기 위해서 그동안 RTK가 어떤 접근을 했었는지 알 수 있었습니다.
+
+다음 예제는 전체적인 구성을 담고 있습니다.
+
+```javascript
+
+import logger from 'redux-logger'
+import { reduxBatch } from '@manaflair/redux-batch'
+
+import todosReducer from './todos/todosReducer'
+import visibilityReducer from './visibility/visibilityReducer'
+
+const rootReducer = {
+  todos: todosReducer,
+  visibility: visibilityReducer,
+}
+
+const initialState = {
+  todos: [
+    {
+      text: 'Eat food',
+      completed: true,
+    },
+    {
+      text: 'Exercise',
+      completed: false,
+    },
+  ],
+  visibilityFilter: 'SHOW_COMPLETED',
+}
+
+const store = configureStore({
+  reducer: rootReducer,
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(logger),
+  devTools: process.env.NODE_ENV !== 'production',
+  initialState,  
+  enhancers: [reduxBatch],
+})
+
+```
+
 
 ### createAction()
 
@@ -126,6 +175,127 @@ const reducer = createReducer(
 ❗️ ```builder.addMatcher```에 대한 모든 호출은 ```builder.addCase``` 호출 후 및 ```builder.addDefaultCase``` 호출 전에 이루어져야 합니다.
 
 ***
+
+### createSlice()
+
+```javascript
+const alertSlice = createSlice({
+  name: 'todos',
+  initialState,
+  reducers: {},
+	extraReducers: (builder) => {}
+});
+```
+
+리덕스 로직을 작성하는 표준 접근법은 ```createSlice```를 사용하는 것에서 출발합니다.
+
+
+앞서 소개해드린 ```createAction```, ```createReducer``` 함수가 내부적으로 사용되며 ```createSlice```에 선언된 슬라이스 이름을 따라서 리듀서와 그리고 그것에 상응하는 액션 생성자와 액션 타입을 자동으로 생성합니다. 따라서 ```createSlice```를 사용하면 따로 ```createAction```, ```createReducer```를 작성할 필요가 없습니다.  
+
+공식 문서의 [리덕스 스타일 가이드][https://redux.js.org/style-guide/]에 따르면 슬라이스 파일은 ```feature 폴더``` 안에서 상태 도메인 별로 나누어 정리하고 있습니다.  
+
+```javascript
+// features/todos/todosSlice.js
+
+import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { nanoid } from 'nanoid'
+
+interface Item {
+  id: string
+  text: string
+}
+
+const todosSlice = createSlice({
+  name: 'todos',
+  initialState: [] as Item[],
+  reducers: {
+    // 액션 타입은 슬라이스 이름을 접두어로 사용해서 자동 생성됩니다. -> 'todos/addTodo'
+    // 이에 상응하는 액션 타입을 가진 액션이 디스패치 되면 리듀서가 실행됩니다.
+    addTodo: {
+      reducer: (state, action: PayloadAction) => {
+        state.push(action.payload)
+      },
+      // 리듀서가 실행되기 이전에 액션의 내용을 편집할 수 있습니다.
+      prepare: (text: string) => {
+        const id = nanoid()
+        return { payload: { id, text } }
+      },
+    },
+  },
+})
+
+const { actions, reducer } = todosSlice
+export const { addTodo } = actions
+
+export default reducer
+```
+
+***
+
+## extraReducers
+
+extraReducers는 createSlice가 생성한 액션 타입 외 다른 액션 타입에 응답할 수 있도록 합니다. 슬라이스 리듀서에 맵핑된 내부 액션 타입이 아니라, 외부의 액션을 참조하려는 의도를 가지고 있습니다.
+
+```javascript
+const usersSlice = createSlice({
+  name: 'users',
+  initialState: { entities: [], loading: 'idle' },
+  reducers: {},
+  extraReducers: (builder) => {
+
+    // 'users/fetchUserById' 액션 타입과 상응하는 리듀서가 정의되어 있지 않지만
+    // 아래처럼 슬라이스 외부에서 액션 타입을 참조하여 상태를 변화시킬 수 있습니다.
+
+    builder.addCase(fetchUserById.fulfilled, (state, action) => {
+      state.entities.push(action.payload)
+    })
+  },
+})
+```
+
+비동기 액션을 생성하는 ```createAsyncThunk``` 함수와의 조화를 생각해 볼 수 있는데요. 아래에서 이어서 다시 알아보겠습니다.  
+
+***
+
+## createAsyncThunk
+
+```javascript
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
+import { userAPI } from './userAPI'
+
+const fetchUserById = createAsyncThunk(
+  'users/fetchByIdStatus',
+  async (userId, thunkAPI) => {
+    const response = await userAPI.fetchById(userId)
+
+    return response.data
+  }
+)
+
+const usersSlice = createSlice({
+  name: 'users',
+  initialState: { entities: [], loading: 'idle' },
+  reducers: {},
+  // extraReducers에 케이스 리듀서를 추가하면
+  // 프로미스의 진행 상태에 따라서 리듀서를 실행할 수 있습니다.
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchUserById.pending, (state) => {})
+      .addCase(fetchUserById.fulfilled, (state, action) => {
+	      state.entities.push(action.payload)
+      })
+      .addCase(fetchUserById.rejected, (state) => {})
+  },
+})
+
+// 위에서 fetchUserById, 즉 thunk를 작성해두고
+// 앱에서 필요한 시점에 디스패치 하여 사용합니다.
+
+// ...
+
+dispatch(fetchUserById(123))
+```
+
 
 ## Quick Start
 
