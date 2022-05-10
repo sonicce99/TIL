@@ -259,6 +259,14 @@ const usersSlice = createSlice({
 
 ## createAsyncThunk
 
+createAsyncThunk 는 action type의 string과 콜백함수를 인자로 받고 promise를 return 합니다.
+
+이것은 비동기요청방식에 추천합니다.
+
+이것은 어떠한 reducer 함수를 생성하지 않기 때문에 우리는 스스로 reducer 로직을 작성해야합니다.
+
+(하지만 굳이 이걸 쓸 바엔 RTK Query를 사용하세요.)
+
 ```javascript
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import { userAPI } from './userAPI'
@@ -287,7 +295,9 @@ const usersSlice = createSlice({
       .addCase(fetchUserById.rejected, (state) => {})
   },
 })
+```
 
+```javascript
 // 위에서 fetchUserById, 즉 thunk를 작성해두고
 // 앱에서 필요한 시점에 디스패치 하여 사용합니다.
 
@@ -295,6 +305,63 @@ const usersSlice = createSlice({
 
 dispatch(fetchUserById(123))
 ```
+
+### type
+
+createAsyncThunk 에서 사용한 string은 3가지의 type을 생성하고 다음과 같이 사용됩니다.
+
+ex) a type argument of 'users/requestStatus' will generate these action types
+
+1. pending: 'users/requestStatus/pending'
+
+2. fulfilled: 'users/requestStatus/fulfilled'
+
+3. rejected: 'users/requestStatus/rejected'
+
+
+### 콜백함수
+
+콜백함수는 비동기요청의 결과를 담은 promise를 반환합니다. 만약 여기서 Error가 있다면 ejected promise를 return 합니다.
+
+콜백함수의 인자로는 arg, thunkAPI 2가지가 있습니다.
+
+- arg :  a single value. (=payload) 전달될 값이다.
+
+- thunkAPI : 보통 Redux thunk function에서 필요한 모든 파라미터를 담고있는 object이다.
+
+    - dispatch
+
+    - getState
+
+    - extra
+
+    - requestId
+
+    - signal
+
+    - rejectWithValue(value, [meta])
+
+    - fulfillWithValue(value, meta)
+
+
+### Return Value
+
+createAsyncThunk 는  Redux thunk action creator 를 반환합니다. 이  Redux thunk action creator는 3가지의 케이스를 가지고 있습니다.
+
+1. pending
+
+2. fulfilled
+
+3. rejected
+
+ex) Using the fetchUserById example above, createAsyncThunk will generate four functions
+
+1. ```fetchUserById.pending```, an action creator that dispatches an 'users/fetchByIdStatus/pending' action
+
+2. ```fetchUserById.fulfilled```, an action creator that dispatches an 'users/fetchByIdStatus/fulfilled' action
+
+3. ```fetchUserById.rejected```, an action creator that dispatches an 'users/fetchByIdStatus/rejected' action
+
 
 
 ## Quick Start
