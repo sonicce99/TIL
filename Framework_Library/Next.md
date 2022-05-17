@@ -1,33 +1,96 @@
-# Next.js
+# Next.js 공식문서 때려잡기.   
 
 React 프레임워크이고 Verel 이라는 회사에서 만듬.
 
-***
+## Next.js가 지향하는 바    
 
-## 설치
+### 개발 환경, 배포 환경
 
-### 1. Manual Setup
+- 개발 환경 : Next.js는 개발자의 경험를 겨냥해 최적화를 합니다. ```TypeScript```, ```ESLint integration```, ```Fast Refresh``` ... 등등
 
-```bash
-$ npm install next react react-dom
-```
+- 배포 환경 : Next.js는 최종 사용자와 앱 사용 경험을 최적화 합니다. 코드를 변환하여 성능과 접근성을 향상 시킵니다.  
 
-```bash
-// package.json
+이렇듯 환경별로 목표하는 target이 다르기 때문에 해야 할 일이 많습니다. 예들들어 ```compiled```, ```bundled```, ```minified```, and ```code split``` ... 등등  
 
-"scripts": {
-  "dev": "next dev",
-  "build": "next build",
-  "start": "next start",
-  "lint": "next lint"
-}
-```
+### Next.js Compiler
 
-### 2. create-next-app
+위에 모든것이 가능한 이유는
 
-```bash
-npx create-next-app@latest --typescript myApp
-```
+- Next.js는 ```Rust로 작성된 컴파일러```를 가지고 있고, 굉장히 low-level programming language 이기 때문이다.
+
+- 컴파일, 축소, 번들링 등에 사용할 수 있는 플랫폼인 ```SWC```가 있기 때문에 가능합니다.
+
+
+#### What is Compiling?
+
+개발자들은 대부분 JSX, TypeScript, 모던한 자바스크립트를 사용하기 때문에 브라우저가 읽을 수 있도록 만들어줘야 합니다.  
+
+![스크린샷 2022-05-17 오전 10 54 15](https://user-images.githubusercontent.com/87749134/168712476-f5ccd0be-15a2-463b-bfb4-e4bd2103cb4c.png)
+
+
+#### What is Minifying?  
+
+개발자들은 인간이 쉽게 읽을 수 있도록 코드를 작성합니다. 이는 ```주석```, ```공간``` 등 불필요한 것들을 포함하기 때문에 코드를 기능적으로 바꾸는 것 없이 이러한 것들을 제거 시켜주어야 합니다.  
+
+![스크린샷 2022-05-17 오전 10 59 05](https://user-images.githubusercontent.com/87749134/168712942-6f913522-7748-41d3-ba20-0f34ea8a3637.png)
+
+Next.js에서는 배포시에 Javascript, CSS 파일을 자동으로 minified 합니다.  
+
+
+#### What is Bundling?
+
+번들링은 사용자가 웹 페이지를 방문할 때 파일에 대한 요청 수를 줄이는 것을 목표로 웹 종속성을 해결하고 파일(또는 모듈)을 브라우저에 최적화된 번들로 병합(또는 '패키징')하는 프로세스입니다.  
+
+#### What is Code Splitting?
+
+개발자는 일반적으로 애플리케이션을 다른 URL에서 액세스할 수 있는 여러 페이지로 분할합니다. 이러한 각 페이지는 애플리케이션에 대한 고유한 진입점이 됩니다.
+
+Code Splitting 은 애플리케이션 번들을 각 진입점에 필요한 더 작은 청크로 분할하는 프로세스입니다. 목표는 해당 페이지를 실행하는 데 필요한 코드만 로드하여 애플리케이션의 초기 로드 시간을 개선하는 것입니다.  
+
+![스크린샷 2022-05-17 오전 11 10 30](https://user-images.githubusercontent.com/87749134/168714089-687f507e-2dd8-4ec6-b718-c673ead91807.png)  
+
+🌟 Next.js는 코드 분할을 기본적으로 지원합니다. pages/ 디렉토리 안의 각 파일은 빌드 단계에서 자동으로 자체 JavaScript 번들로 코드 분할됩니다.  
+
+- 페이지 간에 공유되는 모든 코드는 추가 탐색 시 동일한 코드를 다시 다운로드하는 것을 방지하기 위해 다른 번들로 분할됩니다.
+
+- 초기 페이지 로드 후 Next.js는 사용자가 탐색할 가능성이 있는 다른 페이지의 코드를 미리 로드할 수 있습니다.
+
+- ```Dynamic imports ```는 처음에 로드된 코드를 수동으로 분할하는 또 다른 방법입니다.
+
+#### Build Time and Runtime
+
+**Build Time** 은 앱의 코드를 production mode로 준비하는 일련의 단계들의 연속이다.
+
+앱을 빌드할 때 Next.js는 개발자가 짠 코드를 배포환경에 최적화 하고 배포할 준비를 할 수 있도록 변형시킨다. 다음과 같은 파일을 포함하고 있다.
+
+- 정적 생성된 HTML 파일.
+
+- 서버에서 페이지를 렌더링하기 위한 JavaScript 코드
+
+- 클라이언트와 상호작용 할 수 있는 페이지를 위한 JavaScript 코드  
+
+- CSS files  
+
+#### What is Rendering?
+
+React에서 작성한 코드를 UI의 HTML 표현으로 변환하는 데 피할 수 없는 작업 단위가 있습니다. 이 프로세스를 ```렌더링```이라고 합니다.  
+
+🌟 Next.js에서는 3가지의 렌더링 방법이 존재합니다.
+
+- Static Site Generation (Pre-Rendering)
+
+- Server-Side Rendering (Pre-Rendering)  
+
+- Client-Side Rendering
+
+❗️ ```useEffect```, ```useSWR``` 과 같은 data fetching hook을 사용하여 특정 컴포넌트에서 CSR을 사용할 수 있습니다.
+
+Next.js는 기본적으로 모든 페이지를 Pre-Rendering 합니다. Pre-Rendering 은 HTML이 사용자 장치에서 JavaScript로 모두 수행되는 대신 서버에서 미리 생성됨을 의미합니다.
+
+완전히 클라이언트 측에서 렌더링된 앱의 경우 렌더링 작업이 완료되는 동안 사용자에게 빈 페이지가 표시됩니다.
+
+![스크린샷 2022-05-17 오전 11 37 31](https://user-images.githubusercontent.com/87749134/168716986-c4ba992d-854c-4bf1-ad1b-f560643f1e28.png)
+
 
 ***
 
@@ -48,6 +111,7 @@ npx create-next-app@latest --typescript myApp
 모든 페이지에 공통적인 데이터 패칭이 필요하다면 **_app.tsx에서 미리 데이터 패칭을 해주면 되고, 페이지마다 다른 데이터가 필요하다면 페이지마다 데이터 패칭을 해주면 됩니다.** 그 구체적인 방법에 대해 알아보겠습니다.
 
 ***
+
 
 ## 라우팅 설정하기
 
@@ -330,7 +394,36 @@ import Head from "next/head";
 
 <img src="https://user-images.githubusercontent.com/87749134/161018645-66a7cc28-8d29-4f1a-8246-e174fa4696f1.png" alt="asd" width="600px" />
 
+***
 
+## ESLint
+
+11.0.0 버전부터 Next.js는 통합된 ESLint를 제공합니다.
+
+```bash
+"scripts": {
+  "lint": "next lint"
+}
+```
+
+3가지의 모드가 있습니다.
+
+- Strict : Base configuration + Core Web Vitals rule-set (recommended)
+
+  > "extends": "next/core-web-vitals"
+
+- Base : Base configuration
+
+  > "extends": "next"
+
+- Cancel : None  
+
+위의 2가지 모드는 자동으로 ```eslint```, 와 ```eslint-config-next```를 개발 의존성으로 설치합니다. 그리고 ```.eslintrc.json``` 파일을 만듭니다.
+
+이제 오류를 잡기 위해 ESLint를 실행할 때마다 다음 lint를 실행할 수 있습니다. ESLint가 설정되면 모든 빌드(다음 빌드) 중에 자동으로 실행됩니다. **오류는 빌드에 실패하지만 경고는 그렇지 않습니다.**
+
+
+***
 
 ## 배포하기
 
