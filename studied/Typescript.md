@@ -176,7 +176,7 @@ $ npm install --save-dev @tsconfig/deno
 
 - 🌟 설정하지 않으면 4가지 (node_modules, bower_components, jspm_packages, <outDir>) 을 default로 제외한다.  
 
-- <outDir> 은 항상 제외한다. (include에 있어도)  
+- outDir 은 항상 제외한다. (include에 있어도)  
 
 ### references
 
