@@ -16,13 +16,141 @@ Auth를 만들어야 한다 아마도 쿠키, 세션, 토큰, JWT 같은 단어�
 
 ❗️ 알아야 할 점
 1. 쿠키는 도메인에 따라 제한이 된다.
-  => ex) Youtube 가 준 쿠키는 유튜브에만 보내게 된다.
+  => ex) Youtube가 준 쿠키는 유튜브에서만 유효하다.  
 
 2. 쿠키는 유효기간이 있다.
   => 하루, 한달 등 서버가 정한 기간에 따라 유효  
 
 3. 쿠키는 인증 뿐만 아니라 여러가지 정보를 저장할 수 있다.
   => ex) 웹 사이트 언어 설정을 바꾸면, 서버는 쿠키를 주고 우리가 선택한 언어를 저장한다. 다음에 해당 웹 사이트에 방문하면 쿠키는 요청과 함께 서버로 보내지고 서버는 쿠키가 기억해둔 언어설정 페이지를 제공한다.
+
+
+### 깊게 알아보자  
+
+쿠키는 브라우저에 저장되는 작은 크기의 문자열로, HTTP 프로토콜의 일부입니다.  
+
+쿠키는 주로 웹서버에 의해 만들어집니다. 서버가 HTTP 응답 해더의 ```Set-Cookie```에 내용을 넣어 전달하면, 브라우저는 이 내용을 자체적으로 브라우저에 저장합니다. 브라우저는 동일한 사이트(서버)에 접속할 때마다 쿠키의 내용을 ```Cookie``` 요청 헤더에 넣어서 함께 전달합니다.  
+
+`document.cookie` 프로퍼티를 이용하면 브라우저에서도 쿠키에 접근할 수 있습니다.  
+
+```javascript
+console.log(document.cookie);
+
+// cookie1=value1; cookie2=value2; ...
+```
+
+#### 쿠키 쓰기  
+
+```javascript
+document.cookie = 'user=john'; // 이름이 user인 쿠키의 값만 갱신  
+console.log(document.cookie); // 모든 쿠키 보여주기  
+```
+
+❗️ 쿠키의 이름과 값엔 특별한 제약이 없기 때문에 모든 글자가 허용됩니다. 하지만 형식의 유효성을 일관성 있게 유지하기 위해 반드시 내장 함수 `encodeURIComponent`를 사용하여 이름과 값을 이스케이프 처리해 줘야 합니다.
+
+```javascript
+// 특수 값(공백)은 인코딩 처리해 줘야 합니다.
+let name = "my name";
+let value = "John Smith"
+
+// 인코딩 처리를 해, 쿠키를 my%20name=John%20Smith 로 변경하였습니다.
+document.cookie = encodeURIComponent(name) + '=' + encodeURIComponent(value);
+
+alert(document.cookie); // ...; my%20name=John%20Smith
+```
+
+쿠키를 얻을 때 주의할 점은 쿠키값은 인코딩되어있는 상태이기 때문에 내장 함수인 `decodeURIComponent`를 이용해 쿠키값을 디코딩한다는 점입니다.
+
+```javascript
+// 주어진 이름의 쿠키를 반환하는데,
+// 조건에 맞는 쿠키가 없다면 undefined를 반환합니다.
+function getCookie(name) {
+  let matches = document.cookie.match(new RegExp(
+    "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
+  ));
+  return matches ? decodeURIComponent(matches[1]) : undefined;
+}
+```  
+
+#### path
+
+이 경로나 이 경로의 하위 경로에 있는 페이지만 쿠키에 접근할 수 있습니다. 절대 경로이어야 하고, (미 지정시) 기본값은 현재 경로입니다.
+
+`path=/admin` 옵션을 사용하여 설정한 쿠키는 `/admin`과 `/admin/something`에선 볼 수 있지만, `/home` 이나 `/adminpage`에선 볼 수 없습니다.
+
+특별한 경우가 아니라면, path 옵션을 `path=/`같이 루트로 설정해 웹사이트의 모든 페이지에서 쿠키에 접근할 수 있도록 합시다.
+
+```javascript
+document.cookie = "user=John; path=/;"
+```
+
+#### domain
+
+쿠키에 접근 가능한 domain(도메인)을 지정합니다. 다만, 몇 가지 제약이 있어서 아무 도메인이나 지정할 수 없습니다.
+
+domain 옵션에 아무 값도 넣지 않았다면, 쿠키를 설정한 도메인에서만 쿠키에 접근할 수 있습니다. site.com에서 설정한 쿠키는 other.com에서 얻을 수 없죠.
+
+이 외에 까다로운 제약사항이 하나 더 있습니다. 서브 도메인(subdomain)인 forum.site.com에서도 쿠키 정보를 얻을 수 없다는 점입니다.
+
+
+```javascript
+// site.com에서 쿠키를 설정함
+document.cookie = "user=John"
+
+// site.com의 서브도메인인 forum.site.com에서 user 쿠키에 접근하려 함
+alert(document.cookie); // 찾을 수 없음
+```
+
+그런데 정말 forum.site.com과 같은 서브 도메인에서 site.com에서 생성한 쿠키 정보를 얻을 방법이 없는 걸까요? 방법이 있습니다. site.com에서 쿠키를 설정할 때 domain 옵션에 루트 도메인인 domain=site.com을 명시적으로 설정해 주면 되죠.
+
+```javascript
+// site.com에서
+// 서브 도메인(*.site.com) 어디서든 쿠키에 접속하게 설정할 수 있습니다.
+document.cookie = "user=John; domain=site.com"
+
+// 이렇게 설정하면
+
+// forum.site.com와 같은 서브도메인에서도 쿠키 정보를 얻을 수 있습니다.
+alert(document.cookie); // user=John 쿠키를 확인할 수 있습니다.  
+```
+
+
+#### expires 와 max-age  
+
+expires(유효 일자)나 max-age(만료 기간 (초) ex) 1시간은 3600초) 옵션이 지정되어있지 않으면, 브라우저가 닫힐 때 쿠키도 함께 삭제됩니다. 이런 쿠키를 `세션 쿠키(session cookie)`라고 부릅니다.
+
+expires 나 max-age 옵션을 설정하면 브라우저를 닫아도 쿠키가 삭제되지 않습니다.
+
+expires=Tue, 19 Jan 2038 03:14:07 GMT
+브라우저는 설정된 유효 일자까지 쿠키를 유지하다가, 해당 일자가 도달하면 쿠키를 자동으로 삭제합니다.
+
+쿠키의 유효 일자는 반드시 `GMT(Greenwich Mean Time) 포맷`으로 설정해야 합니다. date.toUTCString을 사용하면 해당 포맷으로 쉽게 변경할 수 있습니다.
+
+
+max-age는 expires 옵션의 대안으로, 쿠키 만료 기간을 설정할 수 있게 해줍니다. 현재부터 설정하고자 하는 만료일시까지의 시간을 초로 환산한 값을 설정합니다.
+
+0이나 음수값을 설정하면 쿠키는 바로 삭제됩니다.
+
+
+#### secure
+
+이 옵션을 설정하면 HTTPS로 통신하는 경우에만 쿠키가 전송됩니다.
+
+secure 옵션이 없으면 기본 설정이 적용되어 http://site.com에서 설정(생성)한 쿠키를 https://site.com에서 읽을 수 있고, https://site.com에서 설정(생성)한 쿠키도 http://site.com에서 읽을 수 있습니다.
+
+쿠키는 기본적으로 도메인만 확인하지 프로토콜을 따지진 않기 때문입니다.
+
+하지만 secure 옵션이 설정된 경우, https://site.com에서 설정한 쿠키는 http://site.com에서 접근할 수 없습니다. 쿠키에 민감한 내용이 저장되어 있어 암호화되지 않은 HTTP 연결을 통해 전달되는 걸 원치 않는다면 이 옵션을 사용하면 됩니다.
+
+
+
+
+
+#### 쿠키의 한계
+
+- `encodeURIComponent`로 인코딩한 이후의 name=value 쌍은 4KB를 넘을 수 없습니다. 이 용량을 넘는 정보는 쿠키에 저장할 수 없습니다.
+
+- 도메인 하나당 저장할 수 있는 쿠키의 개수는 20여 개 정도로 한정되어 있습니다. 개수는 브라우저에 따라 조금씩 다릅니다.
 
 ***
 
@@ -91,3 +219,6 @@ JWT를 사용하면 서버는 생성된 토큰을 모두 수집하지 않는다.
 ex) 코로나 qr체크인
 
 따라서 JWT 를 사용하다가 유저 계정을 좀 더 잘 관리하고 싶다면 세션을 사용한다.
+
+
+출처 : https://ko.javascript.info/cookie  
