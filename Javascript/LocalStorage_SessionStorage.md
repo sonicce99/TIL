@@ -11,6 +11,16 @@ Storage 에는 LocalStorage 와 SessionStorage 2가지가 있다.
 
 **저장은 string만 가능함.**
 
+## ❗️ 여기서 드는 의문
+
+`쿠키를 사용하면 브라우저에 저장할 수 있는데 왜 이걸 또 사용하는 걸까요?`
+
+- 쿠키와 다르게 웹 스토리지 객체는 네트워크 요청 시 서버로 전송되지 않습니다. 이런 특징 때문에 쿠키보다 더 많은 자료를 보관할 수 있습니다. 대부분의 브라우저가 최소 2MB 혹은 그 이상의 웹 스토리지 객체를 저장할 수 있도록 해줍니다. 또한 개발자는 브라우저 내 웹 스토리지 구성 방식을 설정할 수 있습니다.
+
+- 쿠키와 또 다른 점은 서버가 HTTP 헤더를 통해 스토리지 객체를 조작할 수 없다는 것입니다. 웹 스토리지 객체 조작은 모두 자바스크립트 내에서 수행됩니다.
+
+- 웹 스토리지 객체는 도메인·프로토콜·포트로 정의되는 오리진(origin)에 묶여있습니다. 동일한 origin을 가진 모든 창에서 공유되며 프로토콜과 서브 도메인이 다르면 데이터에 접근할 수 없습니다.  
+
 ***
 
 
@@ -35,10 +45,31 @@ ex) storage2.html ↓↓
 
   >> 출력이 배열 타입으로 출력됨.
 
+두 스토리지 객체는 동일한 메서드와 프로퍼티를 제공합니다.
+
+```javascript
+console.log(window.localStorage);
+```
+
+![스크린샷 2022-08-16 오전 10 14 12](https://user-images.githubusercontent.com/87749134/184775025-7d55d5a1-ee76-4df5-b8df-601fec2fc280.png);
+
+- `( local / session )Storage.setItem(key, value)` : 키-값 쌍을 보관합니다.
+
+- `( local / session )Storage.getItem(key)` : 키에 해당하는 값을 받아옵니다.
+
+- `( local / session )Storage.removeItem(key)` : 키와 해당 값을 삭제합니다.
+
+- `( local / session )Storage.clear()` : 모든 것을 삭제합니다.
+
+- `( local / session )Storage.key(index)` : 인덱스(index)에 해당하는 키를 받아옵니다.
+
+- `( local / session )Storage.length` : 저장된 항목의 개수를 얻습니다.  
+
+
+
 ***
 
-#### LocalStorage  
-
+## LocalStorage  
 
 - 스토리지에 저장된 값을 삭제하기 전까지에는 브라우저에 계속 남아있다.
 
@@ -84,13 +115,28 @@ ex)storage2.html ↓↓
 *("name","dong su") 를 set 하고 get으로 "name" 하면 dong su 가 출력됨.*
 
 
+### 키 순회하기  
+
+```javascript
+for(let i=0; i<localStorage.length; i++) {
+  let key = localStorage.key(i);
+  console.log(`${key}: ${localStorage.getItem(key)}`);  
+}
+```
+
+
 ***
 
 
-###  SessionStorage
+##  SessionStorage  
 
+- `sessionStorage`는 현재 떠 있는 탭 내에서만 유지됩니다.
+
+  > 같은 페이지라도 다른 탭에 떠 있으면 다른 곳에 저장됩니다. 
 
 - 브라우저 창을 닫는 순간 사라짐. (페이지를 닫은 후 해당 url로 재접속 하면 null로 나타남.)
+
+- 페이지를 새로고침 할 때 `sessionStorage`에 저장된 데이터는 사라지지 않습니다. 하지만 탭을 닫고 새로 열ㄷ 때는 사라집니다.  
 
 
 ex) storage.html ↓↓
