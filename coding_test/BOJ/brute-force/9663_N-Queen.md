@@ -5,31 +5,60 @@
 ## 내 풀이 ()           
 
 ```javascript
-const getCombination = (X, Y , array) => {
-  array.map((el, row) => {
-    if(row === X) {
+const getCombination = (x, y, N, array, sum, deps) => {
+  if(deps === N) {
+    return sum + 1;
+  }
 
-    }
+  const a = array.map((inner, col) => {
+    return inner.map((el, row) => {
+      if(row === x || col === y || Math.abs(row - x) === Math.abs(col - y)) {
+
+        if(row === x && col === y) {
+          return true;
+        }
+        return false;
+      }
+
+      return el;
+    })
   })
-}
 
-const solution = (N) => {
-  let sum = 0;
-  for(let i=1; i<=N; i++) {
+  console.log(a)
 
-    for(let j=1; j<=N; j++) {
+  const isNextPositionExist = a[y + 1].filter(el => el === true).length;
 
-      const array = new Array(N + 1).fill(null).map(el => new Array(N + 1));
-      const value = getCombination(i, j, array);
-      sum += value;
+  if(isNextPositionExist) {
+    for(let w=0; w<N; w++) {
+      if(a[y + 1][w]) {
+        sum += getCombination(w, y + 1, N, a, sum, deps + 1);
+      }
     }
   }
 
-  return sum;
+  else {
+    return 0;
+  }
+
+
+}
+
+const solution = (N) => {
+  let result = 0;
+
+  for(let x=0; x<N; x++) {
+    let sum = 0;
+    const array = new Array(N).fill(null).map(el => new Array(N).fill(true));
+
+    const value = getCombination(x, 0, N, array, sum, 1);
+    result += value;
+  }
+
+  return result;
 }
 
 
-const N = require('fs').readFileSync('index.txt').toString();;
+const N = require('fs').readFileSync('index.txt').toString();
 
 console.log(solution(Number(N)));
 ```
