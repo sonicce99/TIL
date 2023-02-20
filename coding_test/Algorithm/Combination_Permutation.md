@@ -4,21 +4,26 @@
 ### 조합
 
 ```javascript
-  function Combination (arr,num) {
+const arr = [1,2,3,4,5];
+const M = 2;
+const answer = [];
 
-    const result = [];
-    if(num === 1) {
-      return arr.map((t) => [t])
-    }
-
-    arr.map((fixed,index,origin) => {
-      const rest = origin.slice(index+1);
-      const combi = Combination(rest,num-1);
-      const attached = combi.map((t) => [fixed,...t])
-      result.push(...attached);
-    })
-    return result
+const combination = (depth, index, temp) => {
+  if(depth === M) {
+    answer.push([...temp]);
   }
+
+  else {
+    for(let i=index; i<arr.length; i++) {
+      temp[depth] = arr[i];
+      combination(depth + 1, i + 1, temp);
+    }
+  }
+}
+
+combination(0, 0, []);
+
+console.log(answer)
 ```
 
 
