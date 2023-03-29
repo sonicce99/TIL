@@ -163,7 +163,7 @@ MSA란 각각의 서비스가 독립된 DB를 가지는 것을 말합니다. 이
 
 2. 호이스팅
 
-자바스크립트는 인터프리터 언어로서 인터프리터에 의해 한줄씩 순차적으로 실행됩니다. 하지만 실제로 한줄씩 실행되는 런타임 이전에 자바스크립트는 실행컨텍스트를 생성을 위한 환경정보를 먼저 구성합니다. 이때 variable environment와 Lexcical environment가 생성되는데 저희가 주목해야 할 것은 Lexcical environment입니다. Lexcical environment은 또 2가지로 나뉘게 되는데 environment Record와 outer environment reference가 있습니다, environment Record에는 현재 컨텍스트의 식별자 정보를 저장합니다. 따라서, 실제로 var, let, const, function과 같은 식별자들이 코드 최상단으로 끌어올려지는 것은 아니지만 마치 최상단에 끌어올려진것 처럼 보이게 되는데 이것이 호이스팅의 개념입니다.
+자바스크립트는 인터프리터 언어로서 인터프리터에 의해 한줄씩 순차적으로 실행됩니다. 하지만 실제로 한줄씩 실행되는 런타임 이전에 자바스크립트는 실행컨텍스트를 생성을 위한 환경정보를 먼저 구성합니다. 이때 variable environment와 Lexcical environment가 생성되는데 Lexcical environment은 2가지로 나뉘게 되며, environment Record와 outer environment reference가 있습니다, environment Record에는 현재 컨텍스트의 식별자 정보를 저장합니다. 따라서, 실제로 var, let, const, function과 같은 식별자들이 코드 최상단으로 끌어올려지는 것은 아니지만 마치 최상단에 끌어올려진것 처럼 보이게 되는데 이것이 호이스팅의 개념입니다.
 
 3. 클로저
 
@@ -258,4 +258,4 @@ Reducer는 상태값이 어떻게 업데이트 되는지 정의하는 함수입�
 
 18. strict mode
 
-ES5 부터 추가된 문법으로 자바스크립트의 문법을 더 엄격히 적용하여 오류를 발생시킬 가능성이 높거나, 자바스크립트 엔진의 최적화 작업에 문제를 일으킬 수 있는 코드에 대해 명시적인 에러를 발생시킵니다. strict mode를 사용하기 위해서는 전역의 가장 윗 부분에 'use strict' 구문을 추가한다. 
+ES5 부터 추가된 문법으로 자바스크립트의 문법을 더 엄격히 적용하여 오류를 발생시킬 가능성이 높거나, 자바스크립트 엔진의 최적화 작업에 문제를 일으킬 수 있는 코드에 대해 명시적인 에러를 발생시킵니다. strict mode를 사용하기 위해서는 전역의 가장 윗 부분에 'use strict' 구문을 추가한다.
