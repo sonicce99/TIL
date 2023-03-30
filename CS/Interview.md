@@ -259,3 +259,16 @@ Reducer는 상태값이 어떻게 업데이트 되는지 정의하는 함수입�
 18. strict mode
 
 ES5 부터 추가된 문법으로 자바스크립트의 문법을 더 엄격히 적용하여 오류를 발생시킬 가능성이 높거나, 자바스크립트 엔진의 최적화 작업에 문제를 일으킬 수 있는 코드에 대해 명시적인 에러를 발생시킵니다. strict mode를 사용하기 위해서는 전역의 가장 윗 부분에 'use strict' 구문을 추가한다.
+
+
+19. reconciliation (조화 과정)  
+
+DOM을 조작하는 업데이트가 너무 자주 일어나면, reflow와 repaint를 하는데 성능상의 이슈가 생기게 됩니다. reflow와 repaint를 최소화 하기 위해 리액트는 virtual DOM을 사용하여 변경된 데이터로 새로운 DOM트리를 만듭니다. 이때 render함수가 반환하는 결과를 바로 DOM에 반영하지 않고 기존의 DOM트리와 virtual DOM을 비교하여 최소한의 연산으로 DOM을 업데이트하는데 이를 reconciliation 이라 합니다.
+
+20. DOM이란?
+
+document object model의 약어로, 문서구조를 객체로 표현하는 방법입니다.
+
+21. JSX란?
+
+React에서 자바스크립트로 개발을 편하게 하기 위한 javascript 확장 문법입니다. 
