@@ -3,45 +3,53 @@
 - 백준 : https://www.acmicpc.net/problem/5525
 
 ```javascript
-const makeLps = (pattern) => {
+const makeLPS = (pattern) => {
+    let patternIndex = 0;
     const array = new Array(pattern.length).fill(0);
-    let patternIdx = 0;
 
     for(let i=1; i<pattern.length; i++) {
-        if(pattern[i] === pattern[patternIdx]) {
-            array[i] = ++patternIdx;
+        while(patternIndex > 0 && pattern[i] !== pattern[patternIndex]) {
+            patternIndex = array[patternIndex - 1];
         }
-        else {
-            patternIdx = 0;
+
+        if(pattern[i] === pattern[patternIndex]) {
+            array[i] = ++patternIndex;
         }
     }
 
-    return array
+    return array;
 }
 
 const solution = (string, pattern) => {
+    const lps = makeLPS(pattern);
+
     let patternIndex = 0;
     let answer = 0;
-    const lps = makeLps(pattern);
 
     for(let i=0; i<string.length; i++) {
         while(patternIndex > 0 && string[i] !== pattern[patternIndex]) {
-            patternIndex = lps[patternIndex  - 1];
+            patternIndex = lps[patternIndex - 1];
         }
 
-        if (string[i] === pattern[patternIndex]) {
+        if(string[i] === pattern[patternIndex]) {
 
             if(pattern.length - 1 === patternIndex) {
                 answer++;
                 patternIndex = lps[patternIndex];
+
             }
 
             else {
-                patternIndex++;   
+                patternIndex++;
             }
         }
-    }   
+    }
 
     return answer;
 }
+
+const [n, m, string] = require('fs').readFileSync('/dev/stdin').toString().trim().split('\n');
+const pattern = 'IO'.repeat(n) + 'I';
+
+console.log(solution(string, pattern));
 ```
